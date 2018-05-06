@@ -1,15 +1,13 @@
+# mt6735 platform boardconfig
 LOCAL_PATH := device/intex/ace
+
+#USE_NINJA := false
 
 BLOCK_BASED_OTA := false
 
-# Platform
-TARGET_NO_BOOTLOADER := true
-TARGET_BOARD_PLATFORM := mt6735
-TARGET_BOOTLOADER_BOARD_NAME := mt6735
+# Flags fo patches
 
-# MTK Hardware
 BOARD_USES_MTK_HARDWARE := true
-BOARD_HAS_MTK_HARDWARE := true
 
 ifeq ($(BOARD_USES_MTK_HARDWARE),true)
     mtk_flags := -DMTK_HARDWARE
@@ -25,73 +23,84 @@ ifeq ($(BOARD_USES_MTK_HARDWARE),true)
     2ND_CLANG_TARGET_GLOBAL_CPPFLAGS += $(mtk_flags)
 endif
 
-# Architecture
+
+# Platform
+BOARD_HAS_MTK_HARDWARE := true
+ARCH_ARM_HAVE_TLS_REGISTER := true
+TARGET_BOARD_PLATFORM := mt6735
+TARGET_NO_BOOTLOADER := true
+TARGET_NO_FACTORYIMAGE := true
+
+# CPU
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
 TARGET_CPU_ABI := arm64-v8a
 TARGET_CPU_ABI2 :=
 TARGET_CPU_VARIANT := cortex-a53
+TARGET_CPU_SMP := true
 
 TARGET_2ND_ARCH := arm
 TARGET_2ND_ARCH_VARIANT := armv7-a-neon
 TARGET_2ND_CPU_ABI := armeabi-v7a
 TARGET_2ND_CPU_ABI2 := armeabi
 TARGET_2ND_CPU_VARIANT := cortex-a53
-
 TARGET_BOARD_SUFFIX := _64
 TARGET_USES_64_BIT_BINDER := true
 
+TARGET_CPU_CORTEX_A53 := true
+
+TARGET_BOOTLOADER_BOARD_NAME := mt6735
+
+# Ashmem
+DISABLE_ASHMEM_TRACKING := true
+
 # Kernel
+TARGET_USES_64_BIT_BINDER := true
+TARGET_IS_64_BIT := true
 BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive
-BOARD_MKBOOTIMG_ARGS := --base 0x40078000 --pagesize 2048 --kernel_offset 0x00008000 --ramdisk_offset 0x03f88000 --second_offset 0x00e88000 --tags_offset 0x0df88000 --board 1450352440
+BOARD_KERNEL_BASE := 0x40078000
+BOARD_KERNEL_PAGESIZE := 2048
+BOARD_MKBOOTIMG_ARGS := --base 0x40078000 --pagesize 2048 --kernel_offset 0x00008000 --ramdisk_offset 0x03f88000 --tags_offset 0x0df88000 --board Intex_Aqua_Ace_
 
-# Prebuilt kernel
+#TARGET_KERNEL_SOURCE := kernel/jiayu/s3plus_n560a
+#TARGET_KERNEL_ARCH := arm64
+#TARGET_KERNEL_HEADER_ARCH := arm64
+#TARGET_KERNEL_CONFIG := n560a_defconfig
+#TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-linux-android-
+#MTK_APPENDED_DTB_SUPPORT := yes
+#BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
+
+# Hack for build
 $(shell mkdir -p $(OUT)/obj/KERNEL_OBJ/usr)
-TARGET_PREBUILT_KERNEL := $(LOCAL_PATH)/prebuilt/kernel
 
-# Recovery
-TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/rootdir/recovery.fstab
+TARGET_PREBUILT_KERNEL := device/intex/ace/kernel
 
 # Partitions
-BOARD_BOOTIMAGE_PARTITION_SIZE := 17616076
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 17616076
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 2639265792
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 13421772800
-BOARD_CACHEIMAGE_PARTITION_SIZE := 439353344                                    
+BOARD_BOOTIMAGE_PARTITION_SIZE := 17616076 # 0x1d80000
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 17616076 # 0x2d80000
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 2639265792 # 0xb000000
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 13421772800 # 0xba000000
+BOARD_CACHEIMAGE_PARTITION_SIZE := 439353344 # 0xa1000000                                    
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_FLASH_BLOCK_SIZE := 131072
 
 BOARD_HAS_LARGE_FILESYSTEM := true
 TARGET_USERIMAGES_USE_EXT4 := true
 
-# Bluetooth
-BOARD_HAVE_BLUETOOTH := true
-BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/bluetooth
-
-# Camera
-TARGET_HAS_LEGACY_LP_CAM := true
-
-# Charger
-BACKLIGHT_PATH := /sys/class/leds/lcd-backlight/brightness
-
 # Display
 TARGET_SCREEN_HEIGHT := 1280
 TARGET_SCREEN_WIDTH := 720
-
-USE_OPENGL_RENDERER:=true
+USE_OPENGL_RENDERER := true
+TARGET_FORCE_HWC_FOR_VIRTUAL_DISPLAYS := true
 NUM_FRAMEBUFFER_SURFACE_BUFFERS := 3
 TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
-TARGET_FORCE_HWC_FOR_VIRTUAL_DISPLAYS := true
+BOARD_EGL_CFG := device/intex/ace/egl.cfg
 
-BOARD_EGL_CFG := $(LOCAL_PATH)/prebuilt/egl.cfg
+# Boot animation
+TARGET_BOOTANIMATION_MULTITHREAD_DECODE := true
 
-# Bootanimation
-TARGET_BOOTANIMATION_NAME := 720
-TARGET_BOOTANIMATION_HALF_RES := true
-
-# RIL
-BOARD_PROVIDES_RILD := true
-BOARD_RIL_CLASS := ../../../$(LOCAL_PATH)/ril
+# Audio
+USE_XML_AUDIO_POLICY_CONF := 1
 
 # Wifi
 WPA_SUPPLICANT_VERSION := VER_0_8_X
@@ -104,11 +113,28 @@ WIFI_DRIVER_FW_PATH_STA := STA
 WIFI_DRIVER_FW_PATH_AP := AP
 WIFI_DRIVER_FW_PATH_P2P := P2P
 
+# Camera
+TARGET_HAS_LEGACY_CAMERA_HAL1 := true
+
+# Bluetooth
+BOARD_HAVE_BLUETOOTH := true
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/bluetooth
+
 # LightHAL
 TARGET_PROVIDES_LIBLIGHT := true
 
-# System.prop
+# Recovery
+BOARD_HAS_NO_SELECT_BUTTON := true
+TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/rootdir/recovery.fstab
+
+TARGET_LDPRELOAD += libxlog.so
+
 TARGET_SYSTEM_PROP := $(LOCAL_PATH)/system.prop
+
+# RIL
+BOARD_PROVIDES_RILD := true
+#BOARD_RIL_CLASS := ../../../$(LOCAL_PATH)/ril
+BOARD_RIL_CLASS := ../../../device/intex/ace/ril
 
 # SELinux
 BOARD_SEPOLICY_DIRS := $(LOCAL_PATH)/sepolicy
@@ -116,11 +142,5 @@ BOARD_SEPOLICY_DIRS := $(LOCAL_PATH)/sepolicy
 # Seccomp filter
 BOARD_SECCOMP_POLICY := $(LOCAL_PATH)/seccomp
 
-# Include
+# Include path
 TARGET_SPECIFIC_HEADER_PATH := $(LOCAL_PATH)/include
-
-# Force linking shim
-LINKER_FORCED_SHIM_LIBS := /system/lib/libgui.so|libshim_gui.so:/system/lib64/libgui.so|libshim_gui.so:/system/lib/libmedia.so|libshim_snd.so:/system/lib64/libmedia.so|libshim_snd.so:/system/lib/libui.so|libshim_ui.so:/system/lib64/libui.so|libshim_ui.so:/system/lib/liblog.so|libshim_xlog.so:/system/lib64/liblog.so|libshim_xlog.so
-
-
-

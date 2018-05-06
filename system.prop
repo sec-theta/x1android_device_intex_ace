@@ -76,8 +76,6 @@ ro.mtk_perf_simple_start_win=1
 ro.mtk_perf_response_time=1
 
 
-# add BUG_ID: dushuaihui 20150720(end)
-#add :BUG_ID:JWBLJ-332 shasha.fang 20150909 (start)
 persist.sys.timezone=Asia/Kolkata
 
 persist.sys.isUsbOtgEnabled=true
